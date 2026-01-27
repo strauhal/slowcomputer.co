@@ -1,60 +1,471 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/strauhal/slowcomputer.co/refs/heads/main//apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/strauhal/slowcomputer.co/refs/heads/main//favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="https://raw.githubusercontent.com/strauhal/slowcomputer.co/refs/heads/main//favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>The Slow Computer Company</title>
 
-    <title>slowcomputer.co</title>
+  <!-- IBM Plex Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <meta property="og:title" content="slowcomputer.co">
-    <meta property="og:description" content="description.">
-    <meta property="og:image" content="https://raw.githubusercontent.com/strauhal/slowcomputer.co/refs/heads/main/banner.gif">
-    <meta property="og:url" content="https://slowcomputer.co">
-    <meta property="og:type" content="website">
+  <style>
+    :root{ --bg:#000; --fg:#fff; }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family:"IBM Plex Sans", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:#000;
+      color:#fff;
+      overflow:hidden;
+    }
 
-    <link rel="stylesheet" href="style.css">
-    <script src="/script.js" defer></script>
+    /* FULL SCREEN ASCII (pure white) */
+    .ascii-bg{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#000;
+    }
+    .ascii-bg pre{
+      margin:0;
+      padding:0;
+      color:#fff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      font-size:12px;
+      line-height:1.0;
+      white-space:pre;
+      letter-spacing:.2px;
+      user-select:none;
+      -webkit-font-smoothing:antialiased;
+      max-width:100vw;
+      max-height:100vh;
+      overflow:hidden;
+    }
 
-  </head>  
-  <body>
+    /* Center panel (smaller + pure black background) */
+    .wrap{
+      position:relative;
+      z-index:1;
+      height:100%;
+      display:grid;
+      place-items:center;
+      padding:24px;
+    }
+    .panel{
+      width:min(700px, 88vw);
+      border:1px solid #fff;
+      background:#000;
+      padding:14px;
+    }
+    .topbar{
+      border-bottom:1px solid #fff;
+      padding-bottom:10px;
+      margin-bottom:12px;
+    }
+    .info{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:7px 12px;
+      font-size:11px;
+      line-height:1.2;
+      font-weight:500;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      opacity:.9;
+    }
+    .kv{ display:flex; gap:8px; min-width:0; }
+    .k{ opacity:.65; white-space:nowrap; }
+    .v{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
 
-    <h1>the slow computer company</h1>
+    @media (max-width: 720px){
+      .panel{ width:min(560px, 92vw); }
+      .info{ grid-template-columns: 1fr; }
+    }
 
-    <p>
+    h1{
+      margin:0;
+      font-weight:100;
+      font-size:clamp(30px, 5vw, 58px);
+      letter-spacing:-0.03em;
+      line-height:1.05;
+      text-transform:lowercase;
+    }
+    .subtitle{
+      margin:10px 0 0;
+      font-size:clamp(14px, 1.9vw, 18px);
+      font-weight:300;
+      max-width:62ch;
+      border-left:6px solid #fff;
+      padding-left:12px;
+    }
+    .hr{ margin:14px 0 0; height:1px; background:#fff; }
 
-    	**mockup for angel**<br>
+    .scramble{ display:inline-block; position:relative; padding-right:8px; white-space:pre; }
+    .scramble .ghost{
+      position:absolute;
+      inset:auto 0 -0.15em 0;
+      height:1px;
+      background:rgba(255,255,255,.35);
+    }
 
-		    	<br>
-		laptop form factor<br>
-		e ink display<br>
-		60hz refresh rate<br>
-		32gb hard drive<br>
-		actually scratch that, no hard drive, the whole operating system will run off of an sd card, linux will be the base, all the apps will be written in rust<br>
-		2gb ram<br>
-		runs something that looks like macos system 6<br>
-<br>
-		applications:<br>
+    @media (prefers-reduced-motion: reduce){
+      .ascii-bg{ display:none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ascii-bg" aria-hidden="true">
+    <pre id="ascii">loading…</pre>
+  </div>
 
-		word processing, bitmap image creation, ebooks, can play music files off of flash drives and sd cards<br>
-<br>
-		mp3/wav player <br>
-<br>
-		Outliner / Structured notes<br>
-			•	Bullet trees, folding/moving blocks<br>
-<br>
-		search function<br>
-		music score/notation app<br>
-		sticky notes<br>
-		simple spreadsheet<br>
-		diary<br>
-		calculator<br>
-<br>
-    </p>
+  <main class="wrap">
+    <section class="panel" role="region" aria-label="The Slow Computer Company">
+      <div class="topbar">
+        <div class="info" id="info"></div>
+      </div>
 
-  </body>
+      <h1><span class="scramble" id="title" aria-label="the slow computer company"></span></h1>
+      <p class="subtitle">a different kind of computer</p>
+      <div class="hr"></div>
+    </section>
+  </main>
+
+  <script>
+    // helpers (global)
+    const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
+    const fract = (v)=>v - Math.floor(v);
+
+    // --- Title: shorter total time, slower flicker cadence ---
+    (function(){
+      const el = document.getElementById("title");
+      const target = "the slow computer company";
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{};:,.<>/?|~░▒▓█";
+      const framesPerChar = 16;
+      const stagger = 2;
+      const delayMs = 70;
+      let frame = 0;
+
+      el.innerHTML = `<span id="scr"></span><span class="ghost" aria-hidden="true"></span>`;
+      const scr = document.getElementById("scr");
+      const randChar = () => chars[(Math.random()*chars.length)|0];
+
+      function tick(){
+        let out = "";
+        for(let i=0;i<target.length;i++){
+          const start = i * stagger;
+          const end = start + framesPerChar;
+          if(frame < start) out += " ";
+          else if(frame >= end) out += target[i];
+          else {
+            const p = (frame - start) / framesPerChar;
+            const bias = Math.min(0.85, p*p);
+            out += (Math.random() < bias) ? target[i] : randChar();
+          }
+        }
+        scr.textContent = out;
+
+        frame++;
+        if(frame <= (target.length * stagger + framesPerChar + 10)) setTimeout(tick, delayMs);
+        else scr.textContent = target;
+      }
+      tick();
+    })();
+
+    // --- Browser/device/connection info ---
+    (function(){
+      const info = document.getElementById("info");
+      const n = navigator;
+      const c = n.connection || n.mozConnection || n.webkitConnection;
+
+      const rows = [
+        ["ua", n.userAgent],
+        ["vendor", n.vendor || "—"],
+        ["platform", n.platform || "—"],
+        ["languages", (n.languages && n.languages.join(", ")) || n.language || "—"],
+        ["timezone", (Intl.DateTimeFormat().resolvedOptions().timeZone || "—")],
+        ["screen", `${screen.width}×${screen.height} @${window.devicePixelRatio || 1}x`],
+        ["viewport", `${window.innerWidth}×${window.innerHeight}`],
+        ["color depth", String(screen.colorDepth)],
+        ["memory", (n.deviceMemory ? `${n.deviceMemory} GB` : "—")],
+        ["cores", (n.hardwareConcurrency ? String(n.hardwareConcurrency) : "—")],
+        ["touch", (n.maxTouchPoints != null ? String(n.maxTouchPoints) : "—")],
+        ["cookies", (n.cookieEnabled ? "enabled" : "disabled")],
+        ["dnt", (n.doNotTrack != null ? String(n.doNotTrack) : "—")],
+        ["online", (n.onLine ? "yes" : "no")],
+        ["connection", c ? `${c.effectiveType || "—"} / downlink ${c.downlink || "—"} / rtt ${c.rtt || "—"} / saveData ${c.saveData ? "yes" : "no"}` : "—"],
+      ];
+
+      function render(){
+        info.innerHTML = rows.map(([k,v]) => `
+          <div class="kv" title="${String(v).replaceAll('"','&quot;')}">
+            <div class="k">${k}</div><div class="v">${String(v)}</div>
+          </div>
+        `).join("");
+      }
+      render();
+
+      window.addEventListener("resize", () => {
+        const vp = rows.find(r => r[0] === "viewport");
+        if (vp) vp[1] = `${window.innerWidth}×${window.innerHeight}`;
+        render();
+      }, {passive:true});
+    })();
+
+    // --- Constantly-in-between ASCII images, "boat tossed in ocean" mixing (fixed) ---
+    (function(){
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      const pre = document.getElementById("ascii");
+      const repo = "strauhal/strauh.al3.1";
+      const path = "2000s";
+      const apiURL = `https://api.github.com/repos/${repo}/contents/${path}`;
+
+      // darker pixels -> denser glyphs; text is pure white
+      const ramp = "  .:-=+*#%@█";
+
+      function calcGrid(){
+        const cols = Math.max(90, Math.floor(window.innerWidth / 8.3));
+        const rows = Math.max(28, Math.floor(window.innerHeight / 14.0));
+        return { cols, rows };
+      }
+
+      function imgToASCIILines(img, cols, rows){
+        const canvas = document.createElement("canvas");
+        canvas.width = cols;
+        canvas.height = rows;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+        // centered "cover" crop
+        const iw = img.naturalWidth, ih = img.naturalHeight;
+        const targetAspect = cols / rows;
+        const imgAspect = iw / ih;
+
+        let sx=0, sy=0, sw=iw, sh=ih;
+        if (imgAspect > targetAspect){
+          sw = Math.floor(ih * targetAspect);
+          sx = Math.floor((iw - sw) / 2);
+        } else {
+          sh = Math.floor(iw / targetAspect);
+          sy = Math.floor((ih - sh) / 2);
+        }
+
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cols, rows);
+        const { data } = ctx.getImageData(0, 0, cols, rows);
+
+        const out = new Array(rows);
+        for(let y=0;y<rows;y++){
+          let line = "";
+          for(let x=0;x<cols;x++){
+            const i = (y*cols + x)*4;
+            const r = data[i], g = data[i+1], b = data[i+2];
+            const lum = (0.2126*r + 0.7152*g + 0.0722*b) / 255;
+            const idx = clamp(Math.floor((1 - lum) * (ramp.length - 1)), 0, ramp.length - 1);
+            line += ramp[idx];
+          }
+          out[y] = line;
+        }
+        return out;
+      }
+
+      async function fetchImageList(){
+        const res = await fetch(apiURL, { headers: { "Accept": "application/vnd.github+json" } });
+        if(!res.ok) throw new Error(`GitHub API ${res.status}`);
+        const items = await res.json();
+        const exts = [".png",".jpg",".jpeg",".webp",".gif"];
+        return items
+          .filter(x => x && x.type === "file" && exts.some(e => (x.name || "").toLowerCase().endsWith(e)))
+          .map(x => x.download_url)
+          .filter(Boolean);
+      }
+
+      function loadImage(url){
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error("image load failed"));
+          img.src = url;
+        });
+      }
+
+      function renderBoatMix(linesA, linesB, t, timeSec){
+        const rows = linesA.length;
+        const cols = linesA[0].length;
+
+        // boat motion: sway + bob + slight roll (shear)
+        const swayX = Math.sin(timeSec * 0.85) * 3.2 + Math.sin(timeSec * 2.05) * 1.3;
+        const bobY  = Math.sin(timeSec * 1.05) * 1.4 + Math.sin(timeSec * 2.35) * 0.7;
+        const shear = Math.sin(timeSec * 0.7) * 0.07;
+
+        // sloshing seam runs roughly vertical, but wobbles + never settles
+        const seamBase = t * cols;
+        const seamAmp  = 12 + 7*Math.sin(timeSec*0.33);
+        const seamFreq = 0.11;
+
+        const band = 8.0; // churn thickness
+
+        const out = new Array(rows);
+
+        // time-quantized noise to feel “watery” but coherent
+        const tf = Math.floor(timeSec * 24);
+
+        for(let y=0;y<rows;y++){
+          const rowSway = swayX + (y - rows/2) * shear;
+          const rowShift = Math.round(rowSway);
+          const yShift = Math.round(bobY);
+          const ya = clamp(y + yShift, 0, rows-1);
+
+          const seam =
+            seamBase
+            + Math.sin(timeSec*0.9 + y*seamFreq) * seamAmp
+            + Math.sin(timeSec*1.8 + y*seamFreq*1.7) * (seamAmp*0.35);
+
+          let line = "";
+          for(let x=0;x<cols;x++){
+            const xa = clamp(x + rowShift, 0, cols-1);
+
+            // distance to seam (negative: left side)
+            const d = x - seam;
+
+            // w = probability of choosing B
+            let w;
+            if (d < -band) w = 1;
+            else if (d > band) w = 0;
+            else {
+              const u = (d + band) / (2*band); // 0..1
+              const smooth = 1 - (u*u*(3 - 2*u)); // smoothstep inverted
+              const foam =
+                0.10 * Math.sin(timeSec*4.0 + x*0.20 + y*0.16) +
+                0.07 * Math.sin(timeSec*2.5 + x*0.08 - y*0.21);
+              w = clamp(smooth + foam, 0, 1);
+            }
+
+            // coherent pseudo-random selector (less “tv static”)
+            const r = fract(Math.sin((x*12.9898 + y*78.233 + tf*37.719))*43758.5453);
+
+            const useB = (r < w);
+            const aChar = linesA[ya][xa];
+            const bChar = linesB[ya][xa];
+            line += useB ? bChar : aChar;
+          }
+          out[y] = line;
+        }
+
+        pre.textContent = out.join("\n");
+      }
+
+      let urls = [];
+      let idx = 0;
+
+      let cols = 0, rows = 0;
+      let A = null, B = null;
+      let linesA = null, linesB = null;
+
+      let t = 0;
+      const drift = 0.030;  // how quickly we advance toward next image
+      const wobble = 0.22;  // keeps it “between” forever
+
+      async function ensureGrid(){
+        const g = calcGrid();
+        cols = g.cols; rows = g.rows;
+      }
+
+      async function loadPair(){
+        const urlA = urls[idx % urls.length];
+        const urlB = urls[(idx + 1) % urls.length];
+        const [imgA, imgB] = await Promise.all([loadImage(urlA), loadImage(urlB)]);
+        A = imgA; B = imgB;
+
+        linesA = imgToASCIILines(A, cols, rows).map(s => s.padEnd(cols, " "));
+        linesB = imgToASCIILines(B, cols, rows).map(s => s.padEnd(cols, " "));
+      }
+
+      let advancing = false;
+      async function advanceOne(){
+        if (advancing) return;
+        advancing = true;
+        try{
+          idx = (idx + 1) % urls.length;
+          t = 0;
+
+          // shift B -> A
+          A = B;
+          linesA = linesB;
+
+          // load new B
+          const urlNewB = urls[(idx + 1) % urls.length];
+          const imgNewB = await loadImage(urlNewB);
+          B = imgNewB;
+          linesB = imgToASCIILines(B, cols, rows).map(s => s.padEnd(cols, " "));
+        } finally {
+          advancing = false;
+        }
+      }
+
+      let last = performance.now();
+      function loop(now){
+        const dt = Math.min(0.05, (now - last) / 1000);
+        last = now;
+
+        if(linesA && linesB){
+          t += drift * dt;
+
+          const timeSec = now / 1000;
+          const tWobble = 0.5 + 0.5 * Math.sin(timeSec * 0.55);
+          const tMix = clamp(t + wobble * (tWobble - 0.5), 0, 1);
+
+          renderBoatMix(linesA, linesB, tMix, timeSec);
+
+          if(t >= 1) {
+            // keep the motion continuous while new image loads
+            t = 0.92;
+            advanceOne().catch(()=>{});
+          }
+        }
+
+        requestAnimationFrame(loop);
+      }
+
+      async function start(){
+        try{
+          pre.textContent = "loading images…";
+          await ensureGrid();
+          urls = await fetchImageList();
+          if(!urls.length){
+            pre.textContent = "no images found in /1400s (or blocked by api rate limits).";
+            return;
+          }
+          idx = Math.floor(Math.random() * urls.length);
+          await loadPair();
+          requestAnimationFrame(loop);
+        } catch(e){
+          pre.textContent =
+            "could not load github folder via api.\n" +
+            "possible causes: api rate limit, offline, or cors.\n\n" +
+            `details: ${String(e.message || e)}`;
+        }
+      }
+
+      window.addEventListener("resize", () => {
+        (async () => {
+          if(!urls.length) return;
+          await ensureGrid();
+          if(A && B){
+            linesA = imgToASCIILines(A, cols, rows).map(s => s.padEnd(cols, " "));
+            linesB = imgToASCIILines(B, cols, rows).map(s => s.padEnd(cols, " "));
+          }
+        })().catch(()=>{});
+      }, {passive:true});
+
+      start();
+    })();
+  </script>
+</body>
 </html>
