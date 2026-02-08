@@ -11,112 +11,133 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    :root{ --bg:#000; --fg:#fff; }
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
-    body{
-      margin:0;
-      font-family:"IBM Plex Sans", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:#000;
-      color:#fff;
-      overflow:hidden;
+    :root { 
+      --bg: #fff; 
+      --fg: #000; 
+      --accent-alpha: rgba(0, 0, 0, 0.35);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      overflow: hidden;
     }
 
-    /* FULL SCREEN ASCII (pure white) */
-    .ascii-bg{
-      position:fixed;
-      inset:0;
-      z-index:0;
-      pointer-events:none;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#000;
+    /* FULL SCREEN ASCII */
+    .ascii-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
     }
-    .ascii-bg pre{
-      margin:0;
-      padding:0;
-      color:#fff;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-      font-size:12px;
-      line-height:1.0;
-      white-space:pre;
-      letter-spacing:.2px;
-      user-select:none;
-      -webkit-font-smoothing:antialiased;
-      max-width:100vw;
-      max-height:100vh;
-      overflow:hidden;
+    .ascii-bg pre {
+      margin: 0;
+      padding: 0;
+      color: var(--fg);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.0;
+      white-space: pre;
+      letter-spacing: .2px;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+      max-width: 100vw;
+      max-height: 100vh;
+      overflow: hidden;
+      opacity: 0.8;
     }
 
-    /* Center panel (smaller + pure black background) */
-    .wrap{
-      position:relative;
-      z-index:1;
-      height:100%;
-      display:grid;
-      place-items:center;
-      padding:24px;
+    /* Center panel */
+    .wrap {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 24px;
     }
-    .panel{
-      width:min(700px, 88vw);
-      border:1px solid #fff;
-      background:#000;
-      padding:14px;
+    .panel {
+      width: min(700px, 88vw);
+      border: 1px solid var(--fg);
+      background: var(--bg);
+      padding: 14px;
     }
-    .topbar{
-      border-bottom:1px solid #fff;
-      padding-bottom:10px;
-      margin-bottom:12px;
+    .topbar {
+      border-bottom: 1px solid var(--fg);
+      padding-bottom: 10px;
+      margin-bottom: 12px;
     }
-    .info{
-      display:grid;
+    .info {
+      display: grid;
       grid-template-columns: 1fr 1fr;
-      gap:7px 12px;
-      font-size:11px;
-      line-height:1.2;
-      font-weight:500;
-      text-transform:uppercase;
-      letter-spacing:.06em;
-      opacity:.9;
+      gap: 7px 12px;
+      font-size: 11px;
+      line-height: 1.2;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      opacity: .9;
     }
-    .kv{ display:flex; gap:8px; min-width:0; }
-    .k{ opacity:.65; white-space:nowrap; }
-    .v{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
+    .kv { display: flex; gap: 8px; min-width: 0; }
+    .k { opacity: .65; white-space: nowrap; }
+    .v { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 
-    @media (max-width: 720px){
-      .panel{ width:min(560px, 92vw); }
-      .info{ grid-template-columns: 1fr; }
-    }
-
-    h1{
-      margin:0;
-      font-weight:100;
-      font-size:clamp(30px, 5vw, 58px);
-      letter-spacing:-0.03em;
-      line-height:1.05;
-      text-transform:lowercase;
-    }
-    .subtitle{
-      margin:10px 0 0;
-      font-size:clamp(14px, 1.9vw, 18px);
-      font-weight:300;
-      max-width:62ch;
-      border-left:6px solid #fff;
-      padding-left:12px;
-    }
-    .hr{ margin:14px 0 0; height:1px; background:#fff; }
-
-    .scramble{ display:inline-block; position:relative; padding-right:8px; white-space:pre; }
-    .scramble .ghost{
-      position:absolute;
-      inset:auto 0 -0.15em 0;
-      height:1px;
-      background:rgba(255,255,255,.35);
+    @media (max-width: 720px) {
+      .panel { width: min(560px, 92vw); }
+      .info { grid-template-columns: 1fr; }
     }
 
-    @media (prefers-reduced-motion: reduce){
-      .ascii-bg{ display:none; }
+    h1 {
+      margin: 0;
+      font-weight: 100;
+      font-size: clamp(30px, 5vw, 58px);
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      text-transform: lowercase;
+    }
+    .subtitle {
+      margin: 10px 0 0;
+      font-size: clamp(14px, 1.9vw, 18px);
+      font-weight: 300;
+      max-width: 62ch;
+      border-left: 6px solid var(--fg);
+      padding-left: 12px;
+    }
+    
+    .link-p {
+      text-transform: lowercase;
+      margin-top: 6px;
+    }
+    .link-p a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .link-p a:hover {
+      text-decoration: underline;
+    }
+    .link-p span {
+      text-transform: none; /* Keeps OS uppercase */
+    }
+
+    .hr { margin: 14px 0 0; height: 1px; background: var(--fg); }
+
+    .scramble { display: inline-block; position: relative; padding-right: 8px; white-space: pre; }
+    .scramble .ghost {
+      position: absolute;
+      inset: auto 0 -0.15em 0;
+      height: 1px;
+      background: var(--accent-alpha);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ascii-bg { display: none; }
     }
   </style>
 </head>
@@ -132,17 +153,22 @@
       </div>
 
       <h1><span class="scramble" id="title" aria-label="the slow computer company"></span></h1>
-      <p class="subtitle">a different kind of computer</p>
+ <br>
+      <p class="subtitle link-p">
+        <a href="https://github.com/strauhal/slowOS" target="_blank" rel="noopener">
+          demo slow<span>OS</span> on github
+        </a>
+      </p>
+      
       <div class="hr"></div>
     </section>
   </main>
 
   <script>
-    // helpers (global)
     const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
     const fract = (v)=>v - Math.floor(v);
 
-    // --- Title: shorter total time, slower flicker cadence ---
+    // --- Title scramble ---
     (function(){
       const el = document.getElementById("title");
       const target = "the slow computer company";
@@ -178,7 +204,7 @@
       tick();
     })();
 
-    // --- Browser/device/connection info ---
+    // --- Browser info ---
     (function(){
       const info = document.getElementById("info");
       const n = navigator;
@@ -188,18 +214,12 @@
         ["ua", n.userAgent],
         ["vendor", n.vendor || "—"],
         ["platform", n.platform || "—"],
-        ["languages", (n.languages && n.languages.join(", ")) || n.language || "—"],
         ["timezone", (Intl.DateTimeFormat().resolvedOptions().timeZone || "—")],
-        ["screen", `${screen.width}×${screen.height} @${window.devicePixelRatio || 1}x`],
+        ["screen", `${screen.width}×${screen.height}`],
         ["viewport", `${window.innerWidth}×${window.innerHeight}`],
-        ["color depth", String(screen.colorDepth)],
-        ["memory", (n.deviceMemory ? `${n.deviceMemory} GB` : "—")],
         ["cores", (n.hardwareConcurrency ? String(n.hardwareConcurrency) : "—")],
-        ["touch", (n.maxTouchPoints != null ? String(n.maxTouchPoints) : "—")],
-        ["cookies", (n.cookieEnabled ? "enabled" : "disabled")],
-        ["dnt", (n.doNotTrack != null ? String(n.doNotTrack) : "—")],
         ["online", (n.onLine ? "yes" : "no")],
-        ["connection", c ? `${c.effectiveType || "—"} / downlink ${c.downlink || "—"} / rtt ${c.rtt || "—"} / saveData ${c.saveData ? "yes" : "no"}` : "—"],
+        ["connection", c ? `${c.effectiveType || "—"} / dl ${c.downlink || "—"}` : "—"],
       ];
 
       function render(){
@@ -218,7 +238,7 @@
       }, {passive:true});
     })();
 
-    // --- Constantly-in-between ASCII images, "boat tossed in ocean" mixing (fixed) ---
+    // --- ASCII Background ---
     (function(){
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
@@ -226,8 +246,6 @@
       const repo = "strauhal/strauh.al3.1";
       const path = "2000s";
       const apiURL = `https://api.github.com/repos/${repo}/contents/${path}`;
-
-      // darker pixels -> denser glyphs; text is pure white
       const ramp = "  .:-=+*#%@█";
 
       function calcGrid(){
@@ -238,23 +256,15 @@
 
       function imgToASCIILines(img, cols, rows){
         const canvas = document.createElement("canvas");
-        canvas.width = cols;
-        canvas.height = rows;
+        canvas.width = cols; canvas.height = rows;
         const ctx = canvas.getContext("2d", { willReadFrequently: true });
-
-        // centered "cover" crop
         const iw = img.naturalWidth, ih = img.naturalHeight;
         const targetAspect = cols / rows;
         const imgAspect = iw / ih;
 
         let sx=0, sy=0, sw=iw, sh=ih;
-        if (imgAspect > targetAspect){
-          sw = Math.floor(ih * targetAspect);
-          sx = Math.floor((iw - sw) / 2);
-        } else {
-          sh = Math.floor(iw / targetAspect);
-          sy = Math.floor((ih - sh) / 2);
-        }
+        if (imgAspect > targetAspect){ sw = Math.floor(ih * targetAspect); sx = Math.floor((iw - sw) / 2); }
+        else { sh = Math.floor(iw / targetAspect); sy = Math.floor((ih - sh) / 2); }
 
         ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cols, rows);
         const { data } = ctx.getImageData(0, 0, cols, rows);
@@ -264,8 +274,7 @@
           let line = "";
           for(let x=0;x<cols;x++){
             const i = (y*cols + x)*4;
-            const r = data[i], g = data[i+1], b = data[i+2];
-            const lum = (0.2126*r + 0.7152*g + 0.0722*b) / 255;
+            const lum = (0.2126*data[i] + 0.7152*data[i+1] + 0.0722*data[i+2]) / 255;
             const idx = clamp(Math.floor((1 - lum) * (ramp.length - 1)), 0, ramp.length - 1);
             line += ramp[idx];
           }
@@ -287,102 +296,63 @@
 
       function loadImage(url){
         return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.crossOrigin = "anonymous";
-          img.onload = () => resolve(img);
-          img.onerror = () => reject(new Error("image load failed"));
+          const img = new Image(); img.crossOrigin = "anonymous";
+          img.onload = () => resolve(img); img.onerror = () => reject(new Error("fail"));
           img.src = url;
         });
       }
 
       function renderBoatMix(linesA, linesB, t, timeSec){
-        const rows = linesA.length;
-        const cols = linesA[0].length;
-
-        // boat motion: sway + bob + slight roll (shear)
+        const rows = linesA.length; const cols = linesA[0].length;
         const swayX = Math.sin(timeSec * 0.85) * 3.2 + Math.sin(timeSec * 2.05) * 1.3;
         const bobY  = Math.sin(timeSec * 1.05) * 1.4 + Math.sin(timeSec * 2.35) * 0.7;
         const shear = Math.sin(timeSec * 0.7) * 0.07;
-
-        // sloshing seam runs roughly vertical, but wobbles + never settles
         const seamBase = t * cols;
         const seamAmp  = 12 + 7*Math.sin(timeSec*0.33);
         const seamFreq = 0.11;
-
-        const band = 8.0; // churn thickness
-
+        const band = 8.0;
         const out = new Array(rows);
-
-        // time-quantized noise to feel “watery” but coherent
         const tf = Math.floor(timeSec * 24);
 
         for(let y=0;y<rows;y++){
           const rowSway = swayX + (y - rows/2) * shear;
-          const rowShift = Math.round(rowSway);
-          const yShift = Math.round(bobY);
-          const ya = clamp(y + yShift, 0, rows-1);
-
-          const seam =
-            seamBase
-            + Math.sin(timeSec*0.9 + y*seamFreq) * seamAmp
-            + Math.sin(timeSec*1.8 + y*seamFreq*1.7) * (seamAmp*0.35);
+          const ya = clamp(y + Math.round(bobY), 0, rows-1);
+          const seam = seamBase + Math.sin(timeSec*0.9 + y*seamFreq) * seamAmp + Math.sin(timeSec*1.8 + y*seamFreq*1.7) * (seamAmp*0.35);
 
           let line = "";
           for(let x=0;x<cols;x++){
-            const xa = clamp(x + rowShift, 0, cols-1);
-
-            // distance to seam (negative: left side)
+            const xa = clamp(x + Math.round(rowSway), 0, cols-1);
             const d = x - seam;
-
-            // w = probability of choosing B
             let w;
             if (d < -band) w = 1;
             else if (d > band) w = 0;
             else {
-              const u = (d + band) / (2*band); // 0..1
-              const smooth = 1 - (u*u*(3 - 2*u)); // smoothstep inverted
-              const foam =
-                0.10 * Math.sin(timeSec*4.0 + x*0.20 + y*0.16) +
-                0.07 * Math.sin(timeSec*2.5 + x*0.08 - y*0.21);
+              const u = (d + band) / (2*band);
+              const smooth = 1 - (u*u*(3 - 2*u));
+              const foam = 0.10 * Math.sin(timeSec*4.0 + x*0.20 + y*0.16) + 0.07 * Math.sin(timeSec*2.5 + x*0.08 - y*0.21);
               w = clamp(smooth + foam, 0, 1);
             }
-
-            // coherent pseudo-random selector (less “tv static”)
             const r = fract(Math.sin((x*12.9898 + y*78.233 + tf*37.719))*43758.5453);
-
-            const useB = (r < w);
-            const aChar = linesA[ya][xa];
-            const bChar = linesB[ya][xa];
-            line += useB ? bChar : aChar;
+            line += (r < w) ? linesB[ya][xa] : linesA[ya][xa];
           }
           out[y] = line;
         }
-
         pre.textContent = out.join("\n");
       }
 
-      let urls = [];
-      let idx = 0;
+      let urls = [], idx = 0, cols = 0, rows = 0, A = null, B = null, linesA = null, linesB = null, t = 0;
+      
+      // Morph speed: higher is faster.
+      const drift = 0.090; 
+      const wobble = 0.22;
 
-      let cols = 0, rows = 0;
-      let A = null, B = null;
-      let linesA = null, linesB = null;
-
-      let t = 0;
-      const drift = 0.030;  // how quickly we advance toward next image
-      const wobble = 0.22;  // keeps it “between” forever
-
-      async function ensureGrid(){
-        const g = calcGrid();
-        cols = g.cols; rows = g.rows;
-      }
+      async function ensureGrid(){ const g = calcGrid(); cols = g.cols; rows = g.rows; }
 
       async function loadPair(){
         const urlA = urls[idx % urls.length];
         const urlB = urls[(idx + 1) % urls.length];
         const [imgA, imgB] = await Promise.all([loadImage(urlA), loadImage(urlB)]);
         A = imgA; B = imgB;
-
         linesA = imgToASCIILines(A, cols, rows).map(s => s.padEnd(cols, " "));
         linesB = imgToASCIILines(B, cols, rows).map(s => s.padEnd(cols, " "));
       }
@@ -391,66 +361,39 @@
       async function advanceOne(){
         if (advancing) return;
         advancing = true;
-        try{
+        try {
           idx = (idx + 1) % urls.length;
           t = 0;
-
-          // shift B -> A
-          A = B;
-          linesA = linesB;
-
-          // load new B
-          const urlNewB = urls[(idx + 1) % urls.length];
-          const imgNewB = await loadImage(urlNewB);
+          A = B; linesA = linesB;
+          const imgNewB = await loadImage(urls[(idx + 1) % urls.length]);
           B = imgNewB;
           linesB = imgToASCIILines(B, cols, rows).map(s => s.padEnd(cols, " "));
-        } finally {
-          advancing = false;
-        }
+        } finally { advancing = false; }
       }
 
       let last = performance.now();
       function loop(now){
         const dt = Math.min(0.05, (now - last) / 1000);
         last = now;
-
         if(linesA && linesB){
           t += drift * dt;
-
           const timeSec = now / 1000;
-          const tWobble = 0.5 + 0.5 * Math.sin(timeSec * 0.55);
-          const tMix = clamp(t + wobble * (tWobble - 0.5), 0, 1);
-
+          const tMix = clamp(t + wobble * ((0.5 + 0.5 * Math.sin(timeSec * 0.55)) - 0.5), 0, 1);
           renderBoatMix(linesA, linesB, tMix, timeSec);
-
-          if(t >= 1) {
-            // keep the motion continuous while new image loads
-            t = 0.92;
-            advanceOne().catch(()=>{});
-          }
+          if(t >= 1) { t = 0.95; advanceOne().catch(()=>{}); }
         }
-
         requestAnimationFrame(loop);
       }
 
       async function start(){
-        try{
-          pre.textContent = "loading images…";
+        try {
           await ensureGrid();
           urls = await fetchImageList();
-          if(!urls.length){
-            pre.textContent = "no images found in /1400s (or blocked by api rate limits).";
-            return;
-          }
+          if(!urls.length) return;
           idx = Math.floor(Math.random() * urls.length);
           await loadPair();
           requestAnimationFrame(loop);
-        } catch(e){
-          pre.textContent =
-            "could not load github folder via api.\n" +
-            "possible causes: api rate limit, offline, or cors.\n\n" +
-            `details: ${String(e.message || e)}`;
-        }
+        } catch(e) { pre.textContent = "visualizer offline."; }
       }
 
       window.addEventListener("resize", () => {
