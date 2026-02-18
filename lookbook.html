@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Studies: The Slow Computer Company</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@100;300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #e0e0e0;
+            --font-main: 'IBM Plex Sans', sans-serif;
+            
+            /* Vignelli / Bauhaus Palette */
+            --c-black: #000000;
+            --c-white: #ffffff;
+            --c-red: #f03c31; 
+            --c-blue: #0055b8; 
+            --c-yellow: #ffcc00;
+            --c-green: #00a651;
+            --c-grey: #e6e6e6;
+            
+            /* IBM/Rand Palette */
+            --c-ibm-blue: #006699; 
+            --c-ibm-dark: #1f2a44; 
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-page);
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        /* Interactive Artboard */
+        .artboard {
+            background: white;
+            aspect-ratio: 1 / 1;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex;
+            flex-direction: column;
+            cursor: zoom-in;
+            z-index: 1;
+        }
+
+        .artboard:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        /* Expanded State */
+        .artboard.is-expanded {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 1000;
+            cursor: zoom-out;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+        }
+
+        body.has-expanded-item .artboard:not(.is-expanded) {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* --- LOGO DRAWING ANIMATIONS --- */
+        .logo path {
+            stroke-dasharray: 60; 
+            stroke-dashoffset: 0; 
+            transition: none;
+        }
+
+        /* Animation Styles */
+        .style-clockwise:hover .logo path,
+        .style-clockwise.is-expanded .logo path {
+            stroke-dashoffset: 60;
+            animation: drawLine 1s ease forwards;
+        }
+        .style-clockwise:hover .logo path:nth-child(1) { animation-delay: 0s; }
+        .style-clockwise:hover .logo path:nth-child(2) { animation-delay: 0.2s; }
+        .style-clockwise:hover .logo path:nth-child(3) { animation-delay: 0.4s; }
+        .style-clockwise:hover .logo path:nth-child(4) { animation-delay: 0.6s; }
+
+        .style-center:hover .logo path,
+        .style-center.is-expanded .logo path {
+            stroke-dashoffset: 60; 
+            animation: drawLineReverse 1.2s ease forwards;
+        }
+
+        .style-simul:hover .logo path,
+        .style-simul.is-expanded .logo path {
+            stroke-dashoffset: 60;
+            animation: drawLine 2s ease forwards;
+        }
+        
+        .style-canon:hover .logo path,
+        .style-canon.is-expanded .logo path {
+             stroke-dashoffset: 60;
+             animation: drawLine 1.5s ease forwards;
+        }
+        .style-canon:hover .logo path:nth-child(odd) { animation-delay: 0s; }
+        .style-canon:hover .logo path:nth-child(even) { animation-delay: 0.5s; }
+
+        @keyframes drawLine { to { stroke-dashoffset: 0; } }
+        @keyframes drawLineReverse { from { stroke-dashoffset: -60; } to { stroke-dashoffset: 0; } }
+
+        /* --- TYPEWRITER --- */
+        .typing-cursor::after {
+            content: '|'; animation: blink 1s step-end infinite; margin-left: 2px; color: var(--c-red);
+        }
+        .typing-done::after { content: ''; display: none; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- GLOBAL STYLES --- */
+        .logo { width: 80px; height: auto; fill: none; stroke-width: 2px; stroke-miterlimit: 10; }
+        .is-expanded .logo { width: 150px; stroke-width: 1.5px; }
+
+        .title, .tape-text, .word {
+            font-family: var(--font-main);
+            font-weight: 100 !important; /* Force Thin everywhere */
+            font-size: 1.5rem; letter-spacing: -1px; margin: 0; line-height: 1;
+            transition: font-size 0.4s ease; white-space: pre-wrap;
+        }
+        .is-expanded .title { font-size: 5rem; }
+        .type-target { display: inline-block; min-height: 1.2em; }
+
+        /* --- CLASSIC VIGNELLI STYLES --- */
+        .v-standard .header-bar { width: 100%; height: 35%; background: var(--c-black); display: flex; align-items: center; justify-content: space-between; padding: 0 10%; }
+        .v-standard .logo { stroke: var(--c-white); width: 15%; }
+        .v-standard .content-area { padding: 10%; flex: 1; display: flex; align-items: center; }
+        .v-standard .title { color: var(--c-black); max-width: 90%; font-size: 2rem; }
+        .is-expanded.v-standard .title { font-size: 6rem; }
+
+        .v-big-red { background-color: var(--c-red); justify-content: center; align-items: center; }
+        .v-big-red .logo { width: 120%; stroke: var(--c-black); opacity: 0.15; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); stroke-width: 1px; pointer-events: none; }
+        .v-big-red .title { color: var(--c-white); font-size: 2.5rem; text-align: center; z-index: 2; }
+        .v-big-red .divider { width: 100px; height: 4px; background: var(--c-white); margin: 20px 0; }
+        .is-expanded.v-big-red .title { font-size: 6rem; }
+
+        .v-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; background: var(--c-white); }
+        .v-grid .cell { border: 2px solid var(--c-black); display: flex; padding: 20px; position: relative; overflow: hidden; }
+        .v-grid .c1 { background: var(--c-yellow); }
+        .v-grid .c2 { align-items: flex-end; justify-content: flex-end;}
+        .v-grid .c3 { align-items: flex-end;}
+        .v-grid .c4 { justify-content: center; align-items: center; background: var(--c-black);}
+        .v-grid .logo { width: 40%; stroke: var(--c-black); }
+        .v-grid .c4 .logo { stroke: var(--c-white); width: 50%; }
+        .v-grid .title-part { font-size: 1.5rem; line-height: 0.9; }
+        .is-expanded.v-grid .title-part { font-size: 4rem; }
+
+        .v-scale { justify-content: space-between; padding: 10%; background: var(--c-grey); }
+        .v-scale .logo { width: 100%; height: auto; stroke: var(--c-black); margin-top: -20%; margin-left: -20%; transform: scale(1.5); stroke-width: 1.5px; }
+        .v-scale .title { align-self: flex-end; text-align: right; font-size: 2rem; z-index: 2; }
+        .is-expanded.v-scale .title { font-size: 5rem; }
+
+        .v-stripe { background: var(--c-white); flex-direction: column; justify-content: center; }
+        .v-stripe .band { background: var(--c-black); color: var(--c-white); padding: 5% 10%; width: 100%; display: flex; align-items: center; justify-content: space-between; }
+        .v-stripe .logo { stroke: var(--c-white); width: 15%; }
+        .v-stripe .title { font-size: 1.8rem; }
+        .is-expanded.v-stripe .title { font-size: 4rem; }
+
+        .v-calendar { background: var(--c-white); display: grid; grid-template-columns: 25% 1fr; }
+        .v-calendar .sidebar { background: var(--c-black); display: flex; align-items: flex-start; justify-content: center; padding-top: 20%; }
+        .v-calendar .sidebar .logo { stroke: var(--c-white); width: 50%; }
+        .v-calendar .content { padding: 10%; display: flex; flex-direction: column; justify-content: space-between; }
+        .v-calendar .title { font-size: 3rem; line-height: 0.85; letter-spacing: -3px; }
+        .is-expanded.v-calendar .title { font-size: 8rem; }
+        .v-calendar .meta { border-top: 4px solid var(--c-black); padding-top: 10px; font-weight: 600; }
+
+        .v-negative { background: var(--c-blue); justify-content: center; align-items: center; }
+        .v-negative .circle { background: var(--c-white); border-radius: 50%; width: 60%; aspect-ratio: 1/1; display: flex; justify-content: center; align-items: center; transition: all 0.4s ease; }
+        .is-expanded.v-negative .circle { width: 40vh; }
+        .v-negative .logo { stroke: var(--c-blue); width: 50%; stroke-width: 3px; }
+        .v-negative .title { position: absolute; bottom: 10%; color: var(--c-white); font-size: 1.2rem; letter-spacing: 2px; text-transform: uppercase; }
+        .is-expanded.v-negative .title { font-size: 2rem; }
+
+        .v-corporate { background: var(--c-ibm-dark); justify-content: flex-end; padding-bottom: 0; }
+        .v-corporate .logo-container { flex: 1; display: flex; align-items: center; justify-content: center; }
+        .v-corporate .logo { stroke: var(--c-white); width: 120px; }
+        .v-corporate .footer { background: var(--c-white); width: 100%; padding: 30px; }
+        .v-corporate .title { color: var(--c-black); font-size: 1.2rem; }
+        .is-expanded.v-corporate .title { font-size: 3rem; }
+        .is-expanded.v-corporate .logo { width: 250px; }
+
+        /* --- REPETITION THEMES --- */
+        .v-package { background: #f4f4f4; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); gap: 15px; padding: 30px; align-content: center; }
+        .v-package .logo-tile { stroke: #bbb; width: 100%; opacity: 0.4; transition: stroke 0.3s; }
+        .v-package:hover .logo-tile { stroke: var(--c-blue); opacity: 0.6; }
+        .v-package .text-clearing { grid-column: 2 / span 2; grid-row: 2 / span 2; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .v-package .title { font-size: 1.2rem; color: var(--c-black); }
+        .is-expanded.v-package .title { font-size: 3rem; }
+
+        .v-tape { background: var(--c-white); display: flex; flex-direction: column; justify-content: space-between; padding: 40px 0; overflow: hidden; }
+        .v-tape .tape-row { display: flex; align-items: center; gap: 20px; white-space: nowrap; opacity: 0.3; transition: opacity 0.3s; }
+        .v-tape:hover .tape-row { opacity: 1; }
+        .v-tape .tape-row:nth-child(even) { flex-direction: row-reverse; }
+        .v-tape .logo-sm { width: 30px; stroke: var(--c-black); }
+        .is-expanded.v-tape .logo-sm { width: 60px; }
+        .v-tape .tape-text { font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; }
+        .is-expanded.v-tape .tape-text { font-size: 2.5rem; }
+        .v-tape .tape-row.main { opacity: 1; color: var(--c-ibm-blue); }
+        .v-tape .tape-row.main .logo-sm { stroke: var(--c-ibm-blue); }
+
+        .v-check { background: var(--c-white); display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; padding: 40px; gap: 20px; }
+        .v-check .cell { display: flex; align-items: center; justify-content: center; }
+        .v-check .logo-lg { width: 80%; stroke: var(--c-black); }
+        .v-check .word { font-size: 2rem; text-transform: lowercase; }
+        .is-expanded.v-check .word { font-size: 6rem; }
+        .v-check .cell:nth-child(1) .word { align-self: flex-end; }
+        .v-check .cell:nth-child(4) .word { align-self: flex-start; }
+
+        /* --- BLENDING & COLOR VARIATIONS --- */
+        .v-overprint { background: var(--c-white); position: relative; justify-content: center; align-items: center; }
+        .v-overprint .layer { position: absolute; width: 120px; mix-blend-mode: multiply; opacity: 0.8; transition: transform 0.5s ease; }
+        .is-expanded.v-overprint .layer { width: 300px; }
+        .v-overprint .l-red { stroke: var(--c-red); stroke-width: 2px; transform: translate(-10px, -10px); }
+        .v-overprint .l-blue { stroke: var(--c-blue); stroke-width: 2px; transform: translate(10px, -5px); }
+        .v-overprint .l-yellow { stroke: var(--c-yellow); stroke-width: 2px; transform: translate(0, 10px); }
+        .v-overprint:hover .l-red { transform: translate(-20px, -20px); }
+        .v-overprint:hover .l-blue { transform: translate(20px, -10px); }
+        .v-overprint:hover .l-yellow { transform: translate(0, 20px); }
+        .v-overprint .title { position: absolute; bottom: 20px; z-index: 10; font-size: 1.2rem; color: var(--c-black); }
+
+        .v-quad { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+        .v-quad .q { display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; }
+        .v-quad .q1 { background: var(--c-red); }
+        .v-quad .q2 { background: var(--c-yellow); }
+        .v-quad .q3 { background: var(--c-blue); }
+        .v-quad .q4 { background: var(--c-green); }
+        .v-quad .logo-part { width: 120%; position: absolute; stroke: white; opacity: 0.3; stroke-width: 4px; }
+        .v-quad .q2 .logo-part, .v-quad .q4 .logo-part { stroke: var(--c-black); }
+        .v-quad .q1 .logo-part { top: 10%; left: 10%; }
+        .v-quad .q2 .logo-part { top: 10%; right: 10%; }
+        .v-quad .q3 .logo-part { bottom: 10%; left: 10%; }
+        .v-quad .q4 .logo-part { bottom: 10%; right: 10%; }
+        .v-quad .title-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; z-index: 10; font-size: 1rem; border: 1px solid #000; }
+        .is-expanded.v-quad .title-center { font-size: 3rem; padding: 40px; }
+
+        .v-shift { background: var(--c-white); justify-content: center; align-items: center; position: relative; }
+        .v-shift .logo-layer { position: absolute; width: 100px; stroke-width: 2px; mix-blend-mode: multiply; }
+        .is-expanded.v-shift .logo-layer { width: 250px; }
+        .v-shift .shift-r { stroke: var(--c-red); transform: translateX(-2px); transition: transform 0.3s; }
+        .v-shift .shift-g { stroke: var(--c-green); transform: translateX(2px); transition: transform 0.3s; }
+        .v-shift .shift-b { stroke: var(--c-blue); transform: translateY(-2px); transition: transform 0.3s; }
+        .v-shift:hover .shift-r { transform: translateX(-8px); }
+        .v-shift:hover .shift-g { transform: translateX(8px); }
+        .v-shift:hover .shift-b { transform: translateY(-8px); }
+        .v-shift .title { margin-top: 150px; font-size: 1rem; color: #333; }
+
+        .v-echo { background: #f0f0f0; justify-content: center; align-items: center; position: relative; }
+        .v-echo .logo-echo { position: absolute; stroke-width: 1.5px; transition: all 0.5s ease; }
+        .v-echo .e1 { width: 200px; stroke: var(--c-red); opacity: 0.1; }
+        .v-echo .e2 { width: 140px; stroke: var(--c-blue); opacity: 0.3; }
+        .v-echo .e3 { width: 80px; stroke: var(--c-green); opacity: 1; }
+        .v-echo:hover .e1 { width: 220px; opacity: 0.05; }
+        .v-echo:hover .e2 { width: 160px; opacity: 0.5; }
+        .v-echo:hover .e3 { width: 60px; stroke: var(--c-black); }
+        .is-expanded.v-echo .e1 { width: 500px; }
+        .is-expanded.v-echo .e2 { width: 350px; }
+        .is-expanded.v-echo .e3 { width: 200px; }
+
+        svg { overflow: visible; }
+    </style>
+</head>
+<body>
+
+    <div class="gallery">
+
+        <!-- 1. The Standard -->
+        <div class="artboard v-standard style-clockwise" onclick="toggleExpand(this)">
+            <div class="header-bar">
+                 <svg class="logo" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            </div>
+            <div class="content-area">
+                <h1 class="title type-target">the slow<br>computer<br>company</h1>
+            </div>
+        </div>
+
+        <!-- 2. The Big Red -->
+        <div class="artboard v-big-red style-simul" onclick="toggleExpand(this)">
+            <div class="title type-target">the slow<br>computer<br>company</div>
+            <div class="divider"></div>
+            <svg class="logo" viewBox="0 0 37.33 53.24"><g><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></g></svg>
+        </div>
+
+        <!-- 3. The Grid -->
+        <div class="artboard v-grid style-canon" onclick="toggleExpand(this)">
+            <div class="cell c1"></div>
+            <div class="cell c2"><span class="title-part type-target">the<br>slow</span></div>
+            <div class="cell c3"><span class="title-part type-target">computer<br>company</span></div>
+            <div class="cell c4"><svg class="logo" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg></div>
+        </div>
+
+        <!-- 4. The Scale -->
+        <div class="artboard v-scale style-center" onclick="toggleExpand(this)">
+            <svg class="logo" viewBox="0 0 37.33 53.24"><g><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></g></svg>
+            <div class="title type-target">the<br>slow<br>computer<br>company</div>
+        </div>
+
+        <!-- 5. The Stripe -->
+        <div class="artboard v-stripe style-clockwise" onclick="toggleExpand(this)">
+            <div class="band">
+                <h1 class="title type-target">the slow computer company</h1>
+                <svg class="logo" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            </div>
+        </div>
+
+        <!-- 6. The Calendar -->
+        <div class="artboard v-calendar style-simul" onclick="toggleExpand(this)">
+            <div class="sidebar"><svg class="logo" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg></div>
+            <div class="content">
+                <h1 class="title type-target">the<br>slow<br>computer<br>company</h1>
+                <div class="meta type-target">est. 2026</div>
+            </div>
+        </div>
+
+        <!-- 7. The Negative -->
+        <div class="artboard v-negative style-center" onclick="toggleExpand(this)">
+            <div class="circle"><svg class="logo" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg></div>
+            <div class="title type-target">the slow computer company</div>
+        </div>
+
+        <!-- 8. The Corporate -->
+        <div class="artboard v-corporate style-simul" onclick="toggleExpand(this)">
+            <div class="logo-container">
+                <svg class="logo" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            </div>
+            <div class="footer">
+                <div class="title type-target">the slow computer company</div>
+            </div>
+        </div>
+
+        <!-- 9. The Package -->
+        <div class="artboard v-package style-clockwise" onclick="toggleExpand(this)">
+            <svg class="logo logo-tile" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            <svg class="logo logo-tile" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            <svg class="logo logo-tile" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            <svg class="logo logo-tile" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            <svg class="logo logo-tile" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            <div class="text-clearing"><span class="type-target title">slow<br>computer<br>company</span></div>
+            <svg class="logo logo-tile" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            <svg class="logo logo-tile" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            <svg class="logo logo-tile" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            <svg class="logo logo-tile" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+        </div>
+
+        <!-- 10. The Tape -->
+        <div class="artboard v-tape style-simul" onclick="toggleExpand(this)">
+            <div class="tape-row">
+                <span class="tape-text type-target">the slow computer company</span>
+                <svg class="logo logo-sm" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+                <span class="tape-text type-target">the slow computer company</span>
+                <svg class="logo logo-sm" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            </div>
+            <div class="tape-row main">
+                <span class="tape-text type-target">the slow computer company</span>
+                <svg class="logo logo-sm" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+                <span class="tape-text type-target">the slow computer company</span>
+                <svg class="logo logo-sm" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            </div>
+            <div class="tape-row">
+                <span class="tape-text type-target">the slow computer company</span>
+                <svg class="logo logo-sm" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+                <span class="tape-text type-target">the slow computer company</span>
+                <svg class="logo logo-sm" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            </div>
+        </div>
+
+        <!-- 11. The Checkerboard -->
+        <div class="artboard v-check style-canon" onclick="toggleExpand(this)">
+            <div class="cell"><span class="type-target word">slow</span></div>
+            <div class="cell"><svg class="logo logo-lg" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg></div>
+            <div class="cell"><svg class="logo logo-lg" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg></div>
+            <div class="cell"><span class="type-target word">slow</span></div>
+        </div>
+
+        <!-- 12. The Overprint (Multiply Blend) -->
+        <div class="artboard v-overprint style-simul" onclick="toggleExpand(this)">
+            <svg class="logo layer l-red" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            <svg class="logo layer l-blue" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            <svg class="logo layer l-yellow" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            <div class="title type-target">the slow computer company</div>
+        </div>
+
+        <!-- 13. The Quad (Color Block) -->
+        <div class="artboard v-quad style-simul" onclick="toggleExpand(this)">
+            <div class="q q1"><svg class="logo logo-part" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg></div>
+            <div class="q q2"><svg class="logo logo-part" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg></div>
+            <div class="q q3"><svg class="logo logo-part" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg></div>
+            <div class="q q4"><svg class="logo logo-part" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg></div>
+            <div class="title-center"><span class="type-target title">slow</span></div>
+        </div>
+
+        <!-- 14. The Shift (Chromatic Aberration) -->
+        <div class="artboard v-shift style-simul" onclick="toggleExpand(this)">
+            <svg class="logo logo-layer shift-r" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            <svg class="logo logo-layer shift-g" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            <svg class="logo logo-layer shift-b" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            <div class="title type-target">the slow computer company</div>
+        </div>
+
+        <!-- 15. The Echo (Scale & Opacity) -->
+        <div class="artboard v-echo style-center" onclick="toggleExpand(this)">
+            <svg class="logo logo-echo e1" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            <svg class="logo logo-echo e2" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+            <svg class="logo logo-echo e3" viewBox="0 0 37.33 53.24"><path fill="none" d="M1.25,0c0,9.45-.15,13.23,6.3,15.76C16,19.07,16,24.55,16,24.55"/><path fill="none" d="M36.08,0c0,9.45.15,13.23-6.3,15.76-8.46,3.31-8.46,8.79-8.46,8.79"/><path fill="none" d="M36.08,53.24c0-9.45.15-13.23-6.3-15.75-8.46-3.32-8.46-8.8-8.46-8.8"/><path fill="none" d="M1.25,53.24c0-9.45-.15-13.23,6.3-15.75C16,34.17,16,28.69,16,28.69"/></svg>
+        </div>
+
+    </div>
+
+    <script>
+        // Randomize Gallery Order on Load
+        document.addEventListener('DOMContentLoaded', () => {
+            const gallery = document.querySelector('.gallery');
+            for (let i = gallery.children.length; i >= 0; i--) {
+                gallery.appendChild(gallery.children[Math.random() * i | 0]);
+            }
+        });
+
+        function runTypingSequence(el) {
+            const targets = el.querySelectorAll('.type-target');
+            if (el.dataset.isTyping === "true") return;
+            el.dataset.isTyping = "true";
+
+            targets.forEach((target, index) => {
+                if (!target.dataset.originalText) {
+                    target.dataset.originalText = target.innerText;
+                    target.style.minHeight = target.offsetHeight + 'px';
+                }
+                
+                target.innerText = '';
+                target.classList.add('typing-cursor');
+                
+                const text = target.dataset.originalText;
+                let i = 0;
+                const speed = 30;
+                const delay = index * 300;
+                
+                setTimeout(() => {
+                    const interval = setInterval(() => {
+                        target.innerText = text.substring(0, i + 1);
+                        i++;
+                        if (i === text.length) {
+                            clearInterval(interval);
+                            target.classList.remove('typing-cursor');
+                            target.classList.add('typing-done');
+                            if(index === targets.length - 1) {
+                                el.dataset.isTyping = "false";
+                            }
+                        }
+                    }, speed);
+                }, delay);
+            });
+        }
+
+        function restoreText(el) {
+            const targets = el.querySelectorAll('.type-target');
+            targets.forEach(target => {
+                if (target.dataset.originalText) {
+                    target.innerText = target.dataset.originalText;
+                    target.classList.remove('typing-cursor', 'typing-done');
+                }
+            });
+            el.dataset.isTyping = "false";
+        }
+
+        const artboards = document.querySelectorAll('.artboard');
+        artboards.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                if (!el.classList.contains('is-expanded')) {
+                    runTypingSequence(el);
+                }
+            });
+            el.addEventListener('mouseleave', () => {
+                if (!el.classList.contains('is-expanded')) {
+                    setTimeout(() => {
+                         if (!el.matches(':hover') && !el.classList.contains('is-expanded')) {
+                             restoreText(el);
+                         }
+                    }, 100);
+                }
+            });
+        });
+
+        function toggleExpand(el) {
+            const isExpanding = !el.classList.contains('is-expanded');
+            const currentExpanded = document.querySelector('.is-expanded');
+            if (currentExpanded && currentExpanded !== el) {
+                currentExpanded.classList.remove('is-expanded');
+                restoreText(currentExpanded);
+            }
+            if (document.body.classList.contains('has-expanded-item') && !isExpanding) {
+                document.body.classList.remove('has-expanded-item');
+                el.classList.remove('is-expanded');
+                restoreText(el);
+                return; 
+            }
+            if (isExpanding) {
+                el.classList.add('is-expanded');
+                document.body.classList.add('has-expanded-item');
+                el.dataset.isTyping = "false"; 
+                runTypingSequence(el);
+            }
+        }
+    </script>
+</body>
+</html>
