@@ -10,6 +10,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
 
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <meta property="og:title" content="The Slow Computer Company" />
+  <meta property="og:image" content="slow_computer_co.png" />
+
 <style>
   :root { 
     --bg: #fff; 
@@ -135,7 +143,7 @@
     border-left: 6px solid var(--fg);
     padding-left: 12px;
   }
-  
+   
   .link-p {
     text-transform: lowercase;
     margin-top: 12px;
@@ -169,14 +177,18 @@
         <div class="info" id="info"></div>
       </div>
 
-      <h1><span class="scramble" id="title" aria-label="the slow computer company"></span></h1>
- <br>
+      <!-- ADDED ICON HERE -->
+      <h1>
+        <span class="scramble" id="title" aria-label="the slow computer company"></span><img src="hourglass.png" alt="hourglass" style="height: 0.7em; width: auto; vertical-align: baseline; margin-left: 0.1em; display: inline-block;">
+      </h1>
+      
+      <br>
       <p class="subtitle link-p">
         <a href="https://github.com/strauhal/slowOS" target="_blank" rel="noopener">
           demo slow<span>OS</span> on github
         </a>
       </p>
-      
+       
       <div class="hr"></div>
     </section>
   </main>
@@ -188,7 +200,7 @@
     // --- Title scramble ---
     (function(){
       const el = document.getElementById("title");
-      const target = "the slow computer company";
+      const target = "the slow computer company ";
       const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{};:,.<>/?|~░▒▓█";
       const framesPerChar = 16;
       const stagger = 2;
@@ -358,7 +370,7 @@
       }
 
       let urls = [], idx = 0, cols = 0, rows = 0, A = null, B = null, linesA = null, linesB = null, t = 0;
-      
+       
       // Morph speed: higher is faster.
       const drift = 0.090; 
       const wobble = 0.22;
